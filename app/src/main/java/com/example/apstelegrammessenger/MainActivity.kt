@@ -10,6 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.apstelegrammessenger.databinding.ActivityMainBinding
+import com.example.apstelegrammessenger.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
 

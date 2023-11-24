@@ -20,8 +20,6 @@
         <MultiSelectListPreference
             app:key="allowed_chats"
             app:title="@string/allowed_chats_title"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
