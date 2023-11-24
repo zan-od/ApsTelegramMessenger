@@ -43,4 +43,14 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="telegram_header">Telegram</string>
+
+    <!-- Telegram Preferences -->
+    <string name="app_id">App ID</string>
+    <string name="app_hash">App hash</string>
+    <string name="phone_number">Phone number</string>
+    <string name="allowed_chats_title">Allowed chats</string>
 </resources>

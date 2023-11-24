@@ -1,0 +1,29 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/telegram_header">
+
+        <EditTextPreference
+            app:key="app_id"
+            app:title="@string/app_id"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="app_hash"
+            app:title="@string/app_hash"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="phone_number"
+            app:title="@string/phone_number"
+            app:useSimpleSummaryProvider="true" />
+
+        <MultiSelectListPreference
+            app:key="allowed_chats"
+            app:title="@string/allowed_chats_title"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
