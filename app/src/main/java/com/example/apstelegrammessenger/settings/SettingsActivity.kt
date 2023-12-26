@@ -6,8 +6,9 @@ import androidx.preference.MultiSelectListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.apstelegrammessenger.R
+import com.example.apstelegrammessenger.telegram.Chat
+import com.example.apstelegrammessenger.telegram.TelegramService
 import java.util.stream.Collectors
-import kotlin.random.Random
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,8 +25,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
-        data class Chat(val id:Long, val name:String)
-        private val random = Random(0)
+        private val telegramService = TelegramService.getInstance()
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -65,15 +65,11 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         private fun updateChatList(allowedChatsPreference: MultiSelectListPreference) {
-            val chats: MutableList<Chat> = ArrayList()
-            val num = random.nextInt(100)
-            for (i in 0..num) {
-                chats.add(Chat(i.toLong(), "Item $i"))
-            }
+            val chats: List<Chat> = telegramService.getChats()
 
             val entries = arrayOfNulls<CharSequence>(chats.size)
             val entryValues = arrayOfNulls<CharSequence>(chats.size)
-            for (i in 0..<chats.size) {
+            for (i in chats.indices) {
                 entries[i] = chats[i].name
                 entryValues[i] = chats[i].id.toString()
             }

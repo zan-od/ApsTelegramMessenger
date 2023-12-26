@@ -27,20 +27,15 @@ class AuthorizationHandler(val service: TelegramService): TdAuthorizationHandler
             false
         )
 
-        service.client.send(TdApi.SetTdlibParameters(parameters), resultHandler)
+        service.client!!.send(TdApi.SetTdlibParameters(parameters), resultHandler)
     }
 
     override fun onWaitEncryptionKey() {
-        service.client.send(TdApi.CheckDatabaseEncryptionKey(ByteArray(0)), resultHandler)
+        service.client!!.send(TdApi.CheckDatabaseEncryptionKey(ByteArray(0)), resultHandler)
     }
 
     override fun onWaitPhoneNumber() {
-        service.client.send(TdApi.SetAuthenticationPhoneNumber(service.phoneNumber, null), resultHandler)
-    }
-
-    override fun onWaitCode() {
-        val code = "" //TODO get code from UI
-        //service.client.send(TdApi.CheckAuthenticationCode(code), resultHandler)
+        service.client!!.send(TdApi.SetAuthenticationPhoneNumber(service.phoneNumber, null), resultHandler)
     }
 
     private class AuthorizationResultHandler : Client.ResultHandler {

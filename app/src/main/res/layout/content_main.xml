@@ -17,12 +17,11 @@
         <TextView
             android:id="@+id/textStatus"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
@@ -33,6 +32,7 @@
                 android:layout_weight="1"
                 android:insetLeft="5dp"
                 android:insetRight="5dp"
+                android:onClick="startTelegram"
                 android:text="Start" />
 
             <Button
@@ -42,15 +42,66 @@
                 android:layout_weight="1"
                 android:insetLeft="5dp"
                 android:insetRight="5dp"
+                android:onClick="stopTelegram"
                 android:text="Stop" />
+
+            <Button
+                android:id="@+id/buttonLoadSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:insetLeft="5dp"
+                android:insetRight="5dp"
+                android:onClick="loadSettings"
+                android:text="Load settings" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/buttonSendAuthCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:insetLeft="5dp"
+                android:insetRight="5dp"
+                android:onClick="sendAuthCode"
+                android:text="Send auth code" />
+
+            <Button
+                android:id="@+id/buttonSendTestMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:insetLeft="5dp"
+                android:insetRight="5dp"
+                android:onClick="sendTestMessage"
+                android:text="Send test message" />
+
+            <Button
+                android:id="@+id/buttonUpdateChats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:insetLeft="5dp"
+                android:insetRight="5dp"
+                android:onClick="updateChats"
+                android:text="Update chats" />
 
         </LinearLayout>
 
         <TextView
             android:id="@+id/textLog"
+            android:insetLeft="5dp"
+            android:insetRight="5dp"
+            android:scrollbars = "vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Log" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
