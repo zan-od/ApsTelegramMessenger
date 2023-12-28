@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val telegramService = TelegramService.getInstance()
+    private lateinit var telegramService: TelegramService
 
     private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
     private lateinit var textLog: TextView
@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
+
+        telegramService = (application as ApsTelegramMessengerApplication).telegramService
 
         textLog = findViewById(R.id.textLog)
         textLog.movementMethod = ScrollingMovementMethod()
@@ -143,7 +145,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        telegramService.sendMessage(0, "test")
+        if (telegramService.allowedChats.isEmpty()) {
+            uiLog("Allowed Chats list is empty")
+            return
+        }
+
+        telegramService.sendMessage(telegramService.allowedChats.first(), "test")
     }
 
     fun updateChats(button: View) {

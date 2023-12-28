@@ -1,5 +1,6 @@
 package com.example.apstelegrammessenger.telegram
 
+import com.example.apstelegrammessenger.telegram.command.CommandHandler
 import com.example.apstelegrammessenger.telegram.handler.TdAuthorizationHandlerAdapter
 import com.example.apstelegrammessenger.telegram.handler.TdUpdateHandler
 import com.example.apstelegrammessenger.telegram.handler.TdUpdateHandlerAdapter
@@ -8,10 +9,12 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import org.drinkless.td.libcore.telegram.Client
 import org.drinkless.td.libcore.telegram.TdApi
+import org.drinkless.td.libcore.telegram.TdApi.MessageText
 
-class TelegramService {
+class TelegramService(
+    private val commandHandler: CommandHandler
+) {
     private val chats: MutableList<Chat> = mutableListOf()
-    private lateinit var allowedChats: Set<Long>
 
     private val authorizationStateSubject: PublishSubject<TdApi.AuthorizationState> = PublishSubject.create()
     private val logSubject: PublishSubject<String> = PublishSubject.create()
@@ -23,6 +26,8 @@ class TelegramService {
     var filesDir: String = ""
         private set
     var phoneNumber = ""
+        private set
+    lateinit var allowedChats: Set<Long>
         private set
 
     private val resultHandler: Client.ResultHandler = ResultHandler()
@@ -119,6 +124,19 @@ class TelegramService {
             val chat = updateNewChat.chat
             service.chats.add(Chat(chat.id, chat.title))
         }
+
+        override fun chatLastMessageUpdated(updateChatLastMessage: TdApi.UpdateChatLastMessage) {
+            if (service.allowedChats.contains(updateChatLastMessage.chatId)) {
+                if (updateChatLastMessage.lastMessage?.isOutgoing != true) {
+                    val messageContent = updateChatLastMessage.lastMessage?.content
+                    if (messageContent?.constructor == MessageText.CONSTRUCTOR) {
+                        val messageText = (messageContent as MessageText).text.text
+                        service.uiLog("Received message from chat ${updateChatLastMessage.chatId}: $messageText")
+                        service.commandHandler.handle(updateChatLastMessage.chatId, messageText)
+                    }
+                }
+            }
+        }
     }
 
     class ExceptionHandler : Client.ExceptionHandler {
@@ -145,10 +163,4 @@ class TelegramService {
         }
     }
 
-    companion object {
-        private val INSTANCE:TelegramService = TelegramService()
-        fun getInstance():TelegramService {
-            return INSTANCE
-        }
-    }
 }

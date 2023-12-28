@@ -5,28 +5,31 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.MultiSelectListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.example.apstelegrammessenger.ApsTelegramMessengerApplication
 import com.example.apstelegrammessenger.R
 import com.example.apstelegrammessenger.telegram.Chat
 import com.example.apstelegrammessenger.telegram.TelegramService
 import java.util.stream.Collectors
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var telegramService: TelegramService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        telegramService = (application as ApsTelegramMessengerApplication).telegramService
 
         setContentView(R.layout.settings_activity)
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.settings, SettingsFragment())
+                .replace(R.id.settings, SettingsFragment(telegramService))
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    class SettingsFragment : PreferenceFragmentCompat() {
-        private val telegramService = TelegramService.getInstance()
-
+    class SettingsFragment(private val telegramService: TelegramService) : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
