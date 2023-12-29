@@ -4,12 +4,20 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.example.apstelegrammessenger.telegram.command.ResponseHandler
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.PublishSubject
 
 class ApsDataReceiver(
     private val responseHandler: ResponseHandler
 ): BroadcastReceiver() {
     private val logSubject: PublishSubject<String> = PublishSubject.create()
+
+    fun subscribeToLogUpdates(handler: (String) -> Unit): Disposable {
+        return logSubject
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(handler)
+    }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {

@@ -45,6 +45,11 @@ class TelegramService(
     }
 
     fun start() {
+        if (!validateSettings()) {
+            uiLog("Failed to start service")
+            return
+        }
+
         client = Client.create(TdUpdateHandlerAdapter(UpdateHandler(this)), exceptionHandler, exceptionHandler)
         uiLog("Service started")
     }
@@ -57,7 +62,7 @@ class TelegramService(
 
     fun isStarted(): Boolean = client != null
 
-    fun assertSettingsLoaded(): Boolean {
+    private fun validateSettings(): Boolean {
         if (appId == 0) {
             uiLog("Error! App Id is not set")
             return false
@@ -77,7 +82,7 @@ class TelegramService(
         return true
     }
 
-    fun loadSettings(settings: TelegramSettings) {
+    fun updateSettings(settings: TelegramSettings) {
         appId = settings.appId
         appHash = settings.appHash
         filesDir = settings.filesDir

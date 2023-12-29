@@ -8,21 +8,24 @@ import com.example.apstelegrammessenger.telegram.command.CommandHandler
 import com.example.apstelegrammessenger.telegram.command.ResponseHandler
 
 class ApsTelegramMessengerApplication: Application() {
-    private lateinit var commandHandler:CommandHandler
     lateinit var telegramService: TelegramService
+    lateinit var settingsLoader: TelegramSettingsLoader
+    lateinit var apsDataReceiver: ApsDataReceiver
+    lateinit var commandHandler: TelegramCommandHandler
+
     private lateinit var responseHandler: ResponseHandler
-    private lateinit var apsDataReceiver: ApsDataReceiver
 
     override fun onCreate() {
         super.onCreate()
 
         commandHandler = TelegramCommandHandler(applicationContext)
+        settingsLoader = TelegramSettingsLoader(applicationContext)
         telegramService = TelegramService(commandHandler)
         responseHandler = ApsResponseHandler(telegramService)
         apsDataReceiver = ApsDataReceiver(responseHandler)
 
-        //telegramService.loadSettings()
-        //telegramService.start()
+        telegramService.updateSettings(settingsLoader.load())
+        telegramService.start()
         ContextCompat.registerReceiver(applicationContext, apsDataReceiver,
             IntentFilter(Intents.RESPONSE_FROM_APS), ContextCompat.RECEIVER_EXPORTED)
     }

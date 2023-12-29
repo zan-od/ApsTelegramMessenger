@@ -28,12 +28,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private lateinit var telegramService: TelegramService
+    private lateinit var settingsLoader: TelegramSettingsLoader
 
     private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss")
     private lateinit var textLog: TextView
     private lateinit var textStatus: TextView
     private lateinit var logDisposable: Disposable
     private lateinit var authorizationDisposable: Disposable
+    private lateinit var apsReceiverDisposable: Disposable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +45,9 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        telegramService = (application as ApsTelegramMessengerApplication).telegramService
+        val app = application as ApsTelegramMessengerApplication
+        telegramService = app.telegramService
+        settingsLoader = app.settingsLoader
 
         textLog = findViewById(R.id.textLog)
         textLog.movementMethod = ScrollingMovementMethod()
@@ -53,6 +57,12 @@ class MainActivity : AppCompatActivity() {
         }
         authorizationDisposable = telegramService.subscribeToAuthorizationUpdates {
             uiLog(it.toString())
+        }
+        apsReceiverDisposable = app.commandHandler.subscribeToLogUpdates {
+            uiLog(it)
+        }
+        apsReceiverDisposable = app.apsDataReceiver.subscribeToLogUpdates {
+            uiLog(it)
         }
     }
 
@@ -72,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_settings -> {
                 val myIntent = Intent(this, SettingsActivity::class.java)
-                //myIntent.putExtra("key", value) //Optional parameters
 
                 this@MainActivity.startActivity(myIntent)
 
@@ -89,10 +98,6 @@ class MainActivity : AppCompatActivity() {
     fun startTelegram(button: View) {
         if (telegramService.isStarted()) {
             uiLog("Service already started")
-            return
-        }
-
-        if (!telegramService.assertSettingsLoaded()) {
             return
         }
 
@@ -114,20 +119,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val allowedChats: Set<Long> = prefs.getStringSet("allowed_chats", emptySet())!!
-            .stream().map { it.toLong() }
-            .collect(Collectors.toSet())
-            .toSet()
-        val settings = TelegramSettings(
-            prefs.getString("app_id", "0")!!.toInt(),
-            prefs.getString("app_hash", "")!!,
-            applicationContext.filesDir.absolutePath,
-            prefs.getString("phone_number", "")!!,
-            allowedChats
-        )
-
-        telegramService.loadSettings(settings)
+        telegramService.updateSettings(settingsLoader.load())
     }
 
     fun sendAuthCode(button: View) {
@@ -165,8 +157,8 @@ class MainActivity : AppCompatActivity() {
     private fun enterAuthCode() {
         val alert: AlertDialog.Builder = AlertDialog.Builder(this)
 
-        alert.setTitle("Title")
-        alert.setMessage("Message")
+        alert.setTitle("Auth code")
+        alert.setMessage("Enter Telegram authentication code")
 
         val input = EditText(this)
         alert.setView(input)
