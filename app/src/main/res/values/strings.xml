@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">APS Telegram Messenger</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="action_about">About</string>
 
     <!-- Preference Titles -->
     <string name="telegram_header">Telegram</string>

@@ -2,9 +2,10 @@ package com.example.apstelegrammessenger
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.SpannableString
 import android.text.method.ScrollingMovementMethod
+import android.text.util.Linkify
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -12,15 +13,13 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceManager
 import com.example.apstelegrammessenger.databinding.ActivityMainBinding
 import com.example.apstelegrammessenger.settings.SettingsActivity
 import com.example.apstelegrammessenger.telegram.TelegramService
-import com.example.apstelegrammessenger.telegram.TelegramSettings
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.disposables.Disposable
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.stream.Collectors
 
 
 class MainActivity : AppCompatActivity() {
@@ -85,6 +84,25 @@ class MainActivity : AppCompatActivity() {
 
                 this@MainActivity.startActivity(myIntent)
 
+                return true
+            }
+            R.id.action_about -> {
+                val appNameVersion = getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME
+                var message =
+                    "${getString(R.string.app_name)}\n" +
+                    "Version: ${BuildConfig.VERSION_NAME}\n" +
+                    "A bridge between Android APS and Telegram\n" +
+                    "Copyright 2024 Anatolii Zlatov (anatoly.zlatov@gmail.com)\n" +
+                    "Project URL: https://github.com/zan-od/ApsTelegramMessenger"
+                val messageSpanned = SpannableString(message)
+                Linkify.addLinks(messageSpanned, Linkify.WEB_URLS)
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(appNameVersion)
+                    .setMessage(messageSpanned)
+                    .setPositiveButton("OK", null)
+                    .create().apply {
+                        show()
+                    }
                 return true
             }
             else -> super.onOptionsItemSelected(item)
