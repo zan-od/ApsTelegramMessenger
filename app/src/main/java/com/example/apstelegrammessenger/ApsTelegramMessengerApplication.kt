@@ -1,10 +1,10 @@
 package com.example.apstelegrammessenger
 
 import android.app.Application
+import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
 import com.example.apstelegrammessenger.telegram.TelegramService
-import com.example.apstelegrammessenger.telegram.command.CommandHandler
 import com.example.apstelegrammessenger.telegram.command.ResponseHandler
 
 class ApsTelegramMessengerApplication: Application() {
@@ -28,6 +28,8 @@ class ApsTelegramMessengerApplication: Application() {
         telegramService.start()
         ContextCompat.registerReceiver(applicationContext, apsDataReceiver,
             IntentFilter(Intents.RESPONSE_FROM_APS), ContextCompat.RECEIVER_EXPORTED)
+
+        startService(Intent(this, StayAliveService::class.java))
     }
 
     override fun onTerminate() {
