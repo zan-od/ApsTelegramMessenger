@@ -1,5 +1,6 @@
 package com.example.apstelegrammessenger.telegram
 
+import com.example.apstelegrammessenger.telegram.TelegramStatus.*
 import com.example.apstelegrammessenger.telegram.command.CommandHandler
 import com.example.apstelegrammessenger.telegram.handler.TdAuthorizationHandlerAdapter
 import com.example.apstelegrammessenger.telegram.handler.TdUpdateHandler
@@ -18,6 +19,7 @@ class TelegramService(
 
     private val authorizationStateSubject: PublishSubject<TdApi.AuthorizationState> = PublishSubject.create()
     private val logSubject: PublishSubject<String> = PublishSubject.create()
+    private val statusSubject: PublishSubject<TelegramStatus> = PublishSubject.create()
 
     var appId: Int = 0
         private set
@@ -29,6 +31,16 @@ class TelegramService(
         private set
     lateinit var allowedChats: Set<Long>
         private set
+
+    var status: TelegramStatus = STOPPED
+        private set(value) {
+            field = value
+            statusSubject.onNext(value)
+        }
+
+    fun updateStatus() {
+        statusSubject.onNext(status)
+    }
 
     private val resultHandler: Client.ResultHandler = ResultHandler()
     private val exceptionHandler: Client.ExceptionHandler = ExceptionHandler()
@@ -43,21 +55,37 @@ class TelegramService(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(handler)
     }
+    fun subscribeToStatusUpdates(handler: (TelegramStatus) -> Unit): Disposable {
+        return statusSubject
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(handler)
+    }
 
     fun start() {
         if (!validateSettings()) {
             uiLog("Failed to start service")
+            status = ERROR
             return
         }
 
         client = Client.create(TdUpdateHandlerAdapter(UpdateHandler(this)), exceptionHandler, exceptionHandler)
+        status = STARTING
         uiLog("Service started")
     }
 
     fun stop() {
         client?.close()
         client = null
+        this.status = STOPPED
         uiLog("Service stopped")
+    }
+
+    fun notifyWaitingAuthCode() {
+        status = WAITING_AUTH
+    }
+
+    fun notifyStateReady() {
+        status = CONNECTED
     }
 
     fun isStarted(): Boolean = client != null

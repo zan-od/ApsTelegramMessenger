@@ -38,6 +38,14 @@ class AuthorizationHandler(val service: TelegramService): TdAuthorizationHandler
         service.client!!.send(TdApi.SetAuthenticationPhoneNumber(service.phoneNumber, null), resultHandler)
     }
 
+    override fun onWaitCode() {
+        service.notifyWaitingAuthCode()
+    }
+
+    override fun onStateReady() {
+        service.notifyStateReady()
+    }
+
     private class AuthorizationResultHandler : Client.ResultHandler {
         override fun onResult(apiObject: TdApi.Object) {
             when (apiObject.constructor) {

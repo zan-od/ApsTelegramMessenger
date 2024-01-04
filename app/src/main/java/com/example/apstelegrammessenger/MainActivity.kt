@@ -2,6 +2,7 @@ package com.example.apstelegrammessenger
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.method.ScrollingMovementMethod
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.apstelegrammessenger.databinding.ActivityMainBinding
 import com.example.apstelegrammessenger.settings.SettingsActivity
 import com.example.apstelegrammessenger.telegram.TelegramService
+import com.example.apstelegrammessenger.telegram.TelegramStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.disposables.Disposable
 import java.text.SimpleDateFormat
@@ -33,7 +35,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textLog: TextView
     private lateinit var textStatus: TextView
     private lateinit var logDisposable: Disposable
+    private lateinit var statusDisposable: Disposable
     private lateinit var authorizationDisposable: Disposable
+    private lateinit var commandHandlerDisposable: Disposable
     private lateinit var apsReceiverDisposable: Disposable
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,23 +55,31 @@ class MainActivity : AppCompatActivity() {
         textLog = findViewById(R.id.textLog)
         textLog.movementMethod = ScrollingMovementMethod()
         textStatus = findViewById(R.id.textStatus)
+
         logDisposable = telegramService.subscribeToLogUpdates {
             uiLog(it)
         }
         authorizationDisposable = telegramService.subscribeToAuthorizationUpdates {
             uiLog(it.toString())
         }
-        apsReceiverDisposable = app.commandHandler.subscribeToLogUpdates {
+        statusDisposable = telegramService.subscribeToStatusUpdates {
+            updateStatusView(it)
+        }
+        commandHandlerDisposable = app.commandHandler.subscribeToLogUpdates {
             uiLog(it)
         }
         apsReceiverDisposable = app.apsDataReceiver.subscribeToLogUpdates {
             uiLog(it)
         }
+        telegramService.updateStatus()
     }
 
     override fun onDestroy() {
         logDisposable.dispose()
         authorizationDisposable.dispose()
+        statusDisposable.dispose()
+        commandHandlerDisposable.dispose()
+        apsReceiverDisposable.dispose()
 
         super.onDestroy()
     }
@@ -113,6 +125,20 @@ class MainActivity : AppCompatActivity() {
         textLog.append("${formatter.format(Date())}: $message\n")
     }
 
+    private fun updateStatusView(status: TelegramStatus) {
+        val statusText = status.description
+        val color = when(status) {
+            TelegramStatus.CONNECTED -> Color.GREEN
+            TelegramStatus.STARTING -> Color.WHITE
+            TelegramStatus.STOPPED -> Color.GRAY
+            TelegramStatus.WAITING_AUTH -> Color.YELLOW
+            TelegramStatus.ERROR -> Color.RED
+        }
+
+        textStatus.text = statusText
+        textStatus.setBackgroundColor(color)
+    }
+
     fun startTelegram(button: View) {
         if (telegramService.isStarted()) {
             uiLog("Service already started")
@@ -129,6 +155,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         telegramService.stop()
+    }
+    
+    fun updateStatus(button: View) {
+        telegramService.updateStatus()
     }
 
     fun loadSettings(button: View) {
