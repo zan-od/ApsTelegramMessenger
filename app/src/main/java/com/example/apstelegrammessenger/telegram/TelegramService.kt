@@ -165,7 +165,14 @@ class TelegramService(
                     if (messageContent?.constructor == MessageText.CONSTRUCTOR) {
                         val messageText = (messageContent as MessageText).text.text
                         service.uiLog("Received message from chat ${updateChatLastMessage.chatId}: $messageText")
-                        service.commandHandler.handle(updateChatLastMessage.chatId, messageText)
+
+                        if ("TEST".equals(messageText, ignoreCase = true)) {
+                            val responseText =
+                                "Status = ${service.status.description}"
+                            service.sendMessage(updateChatLastMessage.chatId, responseText)
+                        } else {
+                            service.commandHandler.handle(updateChatLastMessage.chatId, messageText)
+                        }
                     }
                 }
             }
